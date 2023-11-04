@@ -18,13 +18,16 @@
                 
                 {% if user.is_authenticated %}
                 <li>
-                    <a href="/tasks/">TAREAS</a>
+                    <a href="/tasks/">TASK</a>
                 </li>
                 <li>
                     <a href="/logout/">LOGOUT</a>
                 </li>
                 <li>
                     <a href="/tasks/create/">CREATE TASK</a>
+                </li>
+                <li>
+                    <a href="{% url 'tasks_completed' %}">TASK COMPLETED</a>
                 </li>
 
                 {% else %}
@@ -34,6 +37,7 @@
                 <li>
                     <a href="/signin/">SIGNIN</a>
                 </li>
+                
 
                 {% endif %}
 

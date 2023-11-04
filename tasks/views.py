@@ -58,6 +58,12 @@ def tasks(request):
     print(tasks)
     return render(request, "tasks.html", {'tasks': tasks})
 
+def tasks_completed(request):
+    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by
+    ('-datecreated') #Ordena de mas reciente a mas antigua
+    print(tasks)
+    return render(request, "tasks.html", {'tasks': tasks})
+
 
 def close(request): 
     logout(request)
@@ -122,6 +128,7 @@ def complete_task(request, task_id):
     if request.method == 'POST':
         task.datecompleted = timezone.now()
         task.save()
+        
     return redirect('tasks')
 
 def delete_task(request, task_id):
