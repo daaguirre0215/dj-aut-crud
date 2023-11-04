@@ -104,7 +104,7 @@ def create_task(request):
             
 def task_detail(request, task_id):
     try:
-        task = get_object_or_404(Task, pk=task_id)
+        task = get_object_or_404(Task, pk=task_id, user=request.user)
         if request.method == 'POST':
             form = TaskForm(request.POST, instance=task)#Obtenemos un formulario para actualizar la task
             if form.is_valid():
@@ -114,4 +114,4 @@ def task_detail(request, task_id):
             form = TaskForm(instance=task)
         return render(request, 'task_detail.html', {'task': task, 'form': form} )
     except Http404:
-        return render(request, '404.html', status=404)
+        return render(request, '404.html',  status=404)
