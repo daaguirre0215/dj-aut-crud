@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from .forms import TaskForm
 from .models import Task
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, Http404
 
 
 
@@ -105,6 +105,13 @@ def create_task(request):
 def task_detail(request, task_id):
     try:
         task = get_object_or_404(Task, pk=task_id)
-        return render(request, 'task_detail.html', {'task': task})
-    except:
+        if request.method == 'POST':
+            form = TaskForm(request.POST, instance=task)#Obtenemos un formulario para actualizar la task
+            if form.is_valid():
+                form.save()
+            return render(request, 'task_detail.html', {'task': task, 'form':form})
+        else:
+            form = TaskForm(instance=task)
+        return render(request, 'task_detail.html', {'task': task, 'form': form} )
+    except Http404:
         return render(request, '404.html', status=404)
