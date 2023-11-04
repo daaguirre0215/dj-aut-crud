@@ -7,7 +7,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.http import HttpResponse
 from .forms import TaskForm
 from .models import Task
-from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound, Http404
 from django.utils import timezone
 
@@ -52,20 +52,25 @@ def signup(request):
             {"form": UserCreationForm, "error": "Contraseñas, no coinside"},
         )
 
+
 @login_required
 def tasks(request):
-    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True)#Filtra las tareas por user, 
+    # Filtra las tareas por user,
+    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True)
     print(tasks)
     return render(request, "tasks.html", {'tasks': tasks})
 
+
+@login_required
 def tasks_completed(request):
-    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=False).order_by
-    ('-datecreated') #Ordena de mas reciente a mas antigua
+    tasks = Task.objects.filter(
+        user=request.user, datecompleted__isnull=False).order_by
+    ('-datecreated')  # Ordena de mas reciente a mas antigua
     print(tasks)
     return render(request, "tasks.html", {'tasks': tasks})
 
 
-def close(request): 
+def close(request):
     logout(request)
     return redirect("home")
 
@@ -88,52 +93,57 @@ def signin(request):
     else:
         login(request, user)
         return redirect("tasks")
-    
+
+
+@login_required
 def create_task(request):
-        if request.method == "GET":
-            return render(request, 'create_task.html',{
+    if request.method == "GET":
+        return render(request, 'create_task.html', {
             'form': TaskForm
         })
-        else:
-            try:
-                form = TaskForm(request.POST)
-                new_task = form.save(commit=False)#No queremos que guarde la data
-                new_task.user = request.user
-                new_task.save()
-                print(new_task)
-                return redirect('task')
-            except ValueError:
-                return render(request, 'create_task.html',{
-            'form': TaskForm,
-            'error':'¡Error al crear tarea!'
-        })
-            
+    else:
+        try:
+            form = TaskForm(request.POST)
+            # No queremos que guarde la data
+            new_task = form.save(commit=False)
+            new_task.user = request.user
+            new_task.save()
+            print(new_task)
+            return redirect('task')
+        except ValueError:
+            return render(request, 'create_task.html', {
+                'form': TaskForm,
+                'error': '¡Error al crear tarea!'
+            })
+
+@login_required
 def task_detail(request, task_id):
     try:
         task = get_object_or_404(Task, pk=task_id, user=request.user)
         if request.method == 'POST':
-            form = TaskForm(request.POST, instance=task)#Obtenemos un formulario para actualizar la task
+            # Obtenemos un formulario para actualizar la task
+            form = TaskForm(request.POST, instance=task)
             if form.is_valid():
                 form.save()
             return redirect('tasks')
         else:
             form = TaskForm(instance=task)
-        return render(request, 'task_detail.html', {'task': task, 'form': form} )
+        return render(request, 'task_detail.html', {'task': task, 'form': form})
     except Http404:
         return render(request, '404.html',  status=404)
-    
 
+@login_required
 def complete_task(request, task_id):
-    task= get_object_or_404(Task, pk=task_id, user=request.user)
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == 'POST':
         task.datecompleted = timezone.now()
         task.save()
-        
+
     return redirect('tasks')
 
+@login_required
 def delete_task(request, task_id):
-    task= get_object_or_404(Task, pk=task_id, user=request.user)
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
     if request.method == 'POST':
         task.delete()
     return redirect('tasks')
-    
