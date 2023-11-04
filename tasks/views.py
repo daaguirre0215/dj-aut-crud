@@ -109,7 +109,7 @@ def task_detail(request, task_id):
             form = TaskForm(request.POST, instance=task)#Obtenemos un formulario para actualizar la task
             if form.is_valid():
                 form.save()
-            return render(request, 'task_detail.html', {'task': task, 'form':form})
+            return redirect('tasks')
         else:
             form = TaskForm(instance=task)
         return render(request, 'task_detail.html', {'task': task, 'form': form} )
