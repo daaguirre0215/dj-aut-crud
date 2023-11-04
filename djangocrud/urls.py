@@ -33,6 +33,6 @@ urlpatterns = [
     path('task/', views.tasks, name='task'),
     path('tasks/<int:task_id>/', views.task_detail, name='task_detail'),#Definimos una URL con parametros dinamicos
     path('404/', TemplateView.as_view(template_name='404.html'), name='error_404'),
-    
-    
+    path('tasks/<int:task_id>/complete/', views.complete_task, name='complete_task'),
+
 ] 

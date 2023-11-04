@@ -7,9 +7,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.http import HttpResponse
 from .forms import TaskForm
 from .models import Task
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponseNotFound, Http404
-
+from django.utils import timezone
 
 
 # Create your views here.
@@ -115,3 +115,12 @@ def task_detail(request, task_id):
         return render(request, 'task_detail.html', {'task': task, 'form': form} )
     except Http404:
         return render(request, '404.html',  status=404)
+    
+
+def complete_task(request, task_id):
+    task= get_object_or_404(Task, pk=task_id, user=request.user)
+    if request.method == 'POST':
+        task.datecompleted = timezone.now()
+        task.save()
+    return redirect('tasks')
+    
